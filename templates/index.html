@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Career Recommendation</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon" />
+  <style>
+    :root {
+      --primary-color: #0A3D62;
+      --accent-color: #60A3BC;
+      --bg-color: #f0f2f5;
+      --card-bg: #ffffff;
+      --text-color: #2f2f2f;
+      --success-bg: #d4edda;
+      --error-bg: #f8d7da;
+      --success-text: #155724;
+      --error-text: #721c24;
+    }
+
+    body.dark-mode {
+      --bg-color: #1e1e2f;
+      --card-bg: #2e2e3e;
+      --text-color: #eaeaea;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 24px 0;
+      text-align: center;
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    #darkModeToggle {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      padding: 8px 14px;
+      background-color: #ffffff22;
+      border: none;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s ease;
+    }
+
+    #darkModeToggle:hover {
+      background-color: #ffffff44;
+    }
+
+    .container {
+      position: absolute;
+      top: 130px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70%;
+      background-color: var(--card-bg);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.1);
+      z-index: 20;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 25px;
+      color: var(--primary-color);
+    }
+
+    label {
+      font-size: 1rem;
+      margin-top: 12px;
+      display: block;
+    }
+
+    select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      background-color: #f9f9f9;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      margin-top: 24px;
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 500;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #073353;
+    }
+
+    .result,
+    .error {
+      font-size: 1.1rem;
+      margin-top: 20px;
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .result {
+      background-color: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .error {
+      background-color: var(--error-bg);
+      color: var(--error-text);
+    }
+
+    .scene-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: -1;
+    }
+
+    .animation-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: none;
+      margin: 20px auto;
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid var(--primary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Career Recommendation System</h1>
+    <button id="darkModeToggle">🌙 Toggle Dark Mode</button>
+  </header>
+
+  <div class="container">
+    <h2>Find Your Ideal Career Path</h2>
+    <form id="careerForm">
+      <label for="interest">Select your Interest:</label>
+      <select id="interest" name="interest" required>
+        <option value="tech">Tech</option>
+        <option value="bio">Bio</option>
+        <option value="art">Art</option>
+        <option value="math">Math</option>
+        <option value="science">Science</option>
+        <option value="ai">AI</option>
+        <option value="medicine">Medicine</option>
+        <option value="music">Music</option>
+        <option value="design">Design</option>
+        <option value="history">History</option>
+        <option value="education">Education</option>
+        <option value="economics">Economics</option>
+        <option value="engineering">Engineering</option>
+        <option value="business">Business</option>
+        <option value="politics">Politics</option>
+      </select>
+
+      <label for="skill">Select your Skill:</label>
+      <select id="skill" name="skill" required>
+        <option value="coding">Coding</option>
+        <option value="networking">Networking</option>
+        <option value="research">Research</option>
+        <option value="drawing">Drawing</option>
+        <option value="statistics">Statistics</option>
+        <option value="lab">Lab</option>
+        <option value="ai">AI</option>
+        <option value="design">Design</option>
+        <option value="experiment">Experiment</option>
+        <option value="machine learning">Machine Learning</option>
+        <option value="surgery">Surgery</option>
+        <option value="music production">Music Production</option>
+        <option value="data analysis">Data Analysis</option>
+        <option value="graphic design">Graphic Design</option>
+        <option value="teaching">Teaching</option>
+        <option value="writing">Writing</option>
+        <option value="marketing">Marketing</option>
+        <option value="robotics">Robotics</option>
+        <option value="management">Management</option>
+        <option value="negotiation">Negotiation</option>
+      </select>
+
+      <input type="submit" value="Get Career Suggestion" />
+    </form>
+
+    <div class="spinner" id="spinner"></div>
+    <div id="result" class="result" style="display: none;"></div>
+    <div id="error" class="error" style="display: none;"></div>
+  </div>
+
+  <div class="scene-container">
+    <div class="animation-wrapper" id="animationWrapper"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("animationWrapper").appendChild(renderer.domElement);
+
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 32, 32),
+      new THREE.MeshStandardMaterial({ color: 0x5dade2 })
+    );
+    sphere.position.x = -2;
+    scene.add(sphere);
+
+    const cube = new THREE.Mesh(
+      new THREE.BoxGeometry(),
+      new THREE.MeshStandardMaterial({ color: 0xd4d0c5 })
+    );
+    scene.add(cube);
+
+    const light = new THREE.AmbientLight(0x404040, 2);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+    directionalLight.position.set(0, 10, 5).normalize();
+    scene.add(light, directionalLight);
+
+    camera.position.z = 5;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      sphere.rotation.x += 0.01;
+      sphere.rotation.y += 0.01;
+      cube.rotation.x += 0.02;
+      cube.rotation.y += 0.02;
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    document.getElementById('careerForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const spinner = document.getElementById('spinner');
+      const interest = document.getElementById('interest').value;
+      const skill = document.getElementById('skill').value;
+      const result = document.getElementById('result');
+      const error = document.getElementById('error');
+
+      result.style.display = 'none';
+      error.style.display = 'none';
+      spinner.style.display = 'block';
+
+      fetch('http://127.0.0.1:5000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ interest: interest, skill: skill })
+      })
+        .then(response => response.json())
+        .then(data => {
+          spinner.style.display = 'none';
+          if (data.predicted_career) {
+            result.style.display = 'block';
+            result.textContent = `We recommend you to be a: ${data.predicted_career}`;
+          } else {
+            error.style.display = 'block';
+            error.textContent = 'There was an error with your input. Please try again.';
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          spinner.style.display = 'none';
+          error.style.display = 'block';
+          error.textContent = 'An unexpected error occurred. Please try again later.';
+        });
+    });
+
+    // Dark Mode Toggle
+    document.getElementById('darkModeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+  </script>
+</body>
+
+</html>
